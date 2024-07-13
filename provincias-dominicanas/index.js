@@ -1,18 +1,14 @@
-// Importa el cliente de MongoDB y dotenv
-const { MongoClient, ServerApiVersion } = require('mongodb');
+// Import the MongoDB client and dotenv
+const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-// Obtén la URI de conexión de las variables de entorno
+// Getting connection URI from environment variables
 const uri = process.env.MONGODB_URI;
-// Crea una instancia del cliente de MongoDB
-const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
-// Datos de las provincias dominicanas
+
+// Creating the MongoDB client instance
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Data from the Dominican provinces
 const provincias = [
     { nombre: 'Azua', region: 'Sur' },
     { nombre: 'Baoruco', region: 'Sur' },
@@ -48,31 +44,31 @@ const provincias = [
     { nombre: 'Valverde', region: 'Noroeste' }
 ];
 
-// Función principal
+// Main function
 async function main() {
     try {
-        // Conéctate al cliente
+        // Connecting to the client
         await client.connect();
 
-        // Conéctate a la base de datos
-        const database = client.db('dominicanRepublic');
+        // Accessing the database and collection
+        const database = client.db('dominican_republic');
         const collection = database.collection('provincias');
 
-        // Inserta los datos en la colección
+        // Inserting the data
         await collection.insertMany(provincias);
         console.log('Datos insertados correctamente');
 
-        // Recupera e imprime los datos
+        // Querying the data
         const results = await collection.find({}).toArray();
         console.log('Datos en la colección:');
         console.log(results);
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        // Cierra la conexión del cliente
+        // Closing the client
         await client.close();
     }
 }
 
-// Ejecuta la función principal
+// Running the main function
 main().catch(console.error);
